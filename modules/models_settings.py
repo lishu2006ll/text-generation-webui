@@ -153,8 +153,6 @@ def infer_loader(model_name, model_settings):
         loader = 'ExLlamav2_HF'
     elif (path_to_model / 'quant_config.json').exists() or re.match(r'.*-awq', model_name.lower()):
         loader = 'AutoAWQ'
-    elif len(list(path_to_model.glob('*.gguf'))) > 0 and path_to_model.is_dir() and (path_to_model / 'tokenizer_config.json').exists():
-        loader = 'llamacpp_HF'
     elif len(list(path_to_model.glob('*.gguf'))) > 0:
         loader = 'llama.cpp'
     elif re.match(r'.*\.gguf', model_name.lower()):
@@ -227,7 +225,7 @@ def apply_model_settings_to_state(model, state):
         loader = model_settings.pop('loader')
 
         # If the user is using an alternative loader for the same model type, let them keep using it
-        if not (loader == 'ExLlamav2_HF' and state['loader'] in ['GPTQ-for-LLaMa', 'ExLlamav2', 'AutoGPTQ']) and not (loader == 'llama.cpp' and state['loader'] in ['ctransformers']):
+        if not (loader == 'ExLlamav2_HF' and state['loader'] in ['GPTQ-for-LLaMa', 'ExLlamav2', 'AutoGPTQ']) and not (loader == 'llama.cpp' and state['loader'] in ['llamacpp_HF', 'ctransformers']):
             state['loader'] = loader
 
     for k in model_settings:
@@ -245,54 +243,27 @@ def save_model_settings(model, state):
     Save the settings for this model to models/config-user.yaml
     '''
     if model == 'None':
-        yield ("Not saving the settings because no model is selected in the menu.")
+        yield ("Not saving the settings because no model is loaded.")
         return
 
-    user_config = shared.load_user_config()
-    model_regex = model + '$'  # For exact matches
-    if model_regex not in user_config:
-        user_config[model_regex] = {}
+    with Path(f'{shared.args.model_dir}/config-user.yaml') as p:
+        if p.exists():
+            user_config = yaml.safe_load(open(p, 'r').read())
+        else:
+            user_config = {}
 
-    for k in ui.list_model_elements():
-        if k == 'loader' or k in loaders.loaders_and_params[state['loader']]:
-            user_config[model_regex][k] = state[k]
+        model_regex = model + '$'  # For exact matches
+        if model_regex not in user_config:
+            user_config[model_regex] = {}
 
-    shared.user_config = user_config
+        for k in ui.list_model_elements():
+            if k == 'loader' or k in loaders.loaders_and_params[state['loader']]:
+                user_config[model_regex][k] = state[k]
 
-    output = yaml.dump(user_config, sort_keys=False)
-    p = Path(f'{shared.args.model_dir}/config-user.yaml')
-    with open(p, 'w') as f:
-        f.write(output)
+        shared.user_config = user_config
 
-    yield (f"Settings for `{model}` saved to `{p}`.")
+        output = yaml.dump(user_config, sort_keys=False)
+        with open(p, 'w') as f:
+            f.write(output)
 
-
-def save_instruction_template(model, template):
-    '''
-    Similar to the function above, but it saves only the instruction template.
-    '''
-    if model == 'None':
-        yield ("Not saving the template because no model is selected in the menu.")
-        return
-
-    user_config = shared.load_user_config()
-    model_regex = model + '$'  # For exact matches
-    if model_regex not in user_config:
-        user_config[model_regex] = {}
-
-    if template == 'None':
-        user_config[model_regex].pop('instruction_template', None)
-    else:
-        user_config[model_regex]['instruction_template'] = template
-
-    shared.user_config = user_config
-
-    output = yaml.dump(user_config, sort_keys=False)
-    p = Path(f'{shared.args.model_dir}/config-user.yaml')
-    with open(p, 'w') as f:
-        f.write(output)
-
-    if template == 'None':
-        yield (f"Instruction template for `{model}` unset in `{p}`, as the value for template was `{template}`.")
-    else:
-        yield (f"Instruction template for `{model}` saved to `{p}` as `{template}`.")
+        yield (f"Settings for `{model}` saved to `{p}`.")
