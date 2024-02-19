@@ -172,7 +172,7 @@ group.add_argument('--trust-remote-code', action='store_true', default=True, hel
 
 # HQQ
 group = parser.add_argument_group('HQQ')
-group.add_argument('--hqq_backend', type=str, default='PYTORCH_COMPILE', help='Backend for the HQQ loader. Valid options: PYTORCH, PYTORCH_COMPILE, ATEN.')
+group.add_argument('--hqq-backend', type=str, default='PYTORCH_COMPILE', help='Backend for the HQQ loader. Valid options: PYTORCH, PYTORCH_COMPILE, ATEN.')
 
 # DeepSpeed
 group = parser.add_argument_group('DeepSpeed')
