@@ -2,17 +2,15 @@
 
 | Loader         | Loading 1 LoRA | Loading 2 or more LoRAs | Training LoRAs | Multimodal extension | Perplexity evaluation |
 |----------------|----------------|-------------------------|----------------|----------------------|-----------------------|
-| Transformers   |       ✅       |           ✅\*\*\*      |       ✅\*     |          ✅          |           ✅          |
-| llama.cpp      |       ❌       |           ❌            |       ❌       |          ❌          |    use llamacpp_HF    |
-| llamacpp_HF    |       ❌       |           ❌            |       ❌       |          ❌          |           ✅          |
+| Transformers   |       ✅       |           ✅***            |       ✅*       |          ✅          |           ✅          |
 | ExLlamav2_HF   |       ✅       |           ✅            |       ❌       |          ❌          |           ✅          |
-| ExLlamav2      |       ✅       |           ✅            |       ❌       |          ❌          |   use ExLlamav2_HF    |
+| ExLlamav2      |       ✅       |           ✅            |       ❌       |          ❌          |           use ExLlamav2_HF    |
 | AutoGPTQ       |       ✅       |           ❌            |       ❌       |          ✅          |           ✅          |
-| AutoAWQ        |       ?        |           ❌            |       ?        |          ?           |           ✅          |
-| GPTQ-for-LLaMa |       ✅\*\*   |           ✅\*\*\*      |       ✅       |          ✅          |           ✅          |
+| GPTQ-for-LLaMa |       ✅**       |           ✅***            |       ✅       |          ✅          |           ✅          |
+| llama.cpp      |       ❌       |           ❌            |       ❌       |          ❌          |           use llamacpp_HF    |
+| llamacpp_HF    |       ❌       |           ❌            |       ❌       |          ❌          |           ✅          |
 | ctransformers  |       ❌       |           ❌            |       ❌       |          ❌          |           ❌          |
-| QuIP#          |       ?        |           ?             |       ?        |          ?           |           ✅          |
-| HQQ            |       ?        |           ?             |       ?        |          ?           |           ✅          |
+| AutoAWQ        |       ?        |           ❌            |       ?       |          ?          |           ✅          |
 
 ❌ = not implemented
 
