@@ -16,7 +16,8 @@ import modules.shared as shared
 from modules.callbacks import (
     Iteratorize,
     Stream,
-    _StopEverythingStoppingCriteria
+    _StopEverythingStoppingCriteria,
+    StopWordsCriteria
 )
 from modules.extensions import apply_extensions
 from modules.grammar.grammar_utils import initialize_grammar
@@ -141,8 +142,10 @@ def encode(prompt, add_special_tokens=True, add_bos_token=True, truncation_lengt
     elif torch.backends.mps.is_available():
         device = torch.device('mps')
         return input_ids.to(device)
-    elif is_torch_xpu_available():
-        return input_ids.to("xpu:0")
+    elif shared.args.device == "CPU":
+        return input_ids
+    elif is_torch_xpu_available() or shared.args.device == "GPU":
+        return input_ids.to("xpu")
     else:
         return input_ids.cuda()
 
@@ -268,8 +271,8 @@ def apply_stopping_strings(reply, all_stop_strings):
     return reply, stop_found
 
 
-def get_reply_from_output_ids(output_ids, state=None, starting_from=0):
-    reply = decode(output_ids[starting_from:], state['skip_special_tokens'] if state else True)
+def get_reply_from_output_ids(output_ids, state, starting_from=0):
+    reply = decode(output_ids[starting_from:], state['skip_special_tokens'])
 
     # Handle tokenizers that do not add the leading space for the first token
     if (hasattr(shared.tokenizer, 'convert_ids_to_tokens') and len(output_ids) > starting_from) and not reply.startswith(' '):
@@ -285,14 +288,11 @@ def get_reply_from_output_ids(output_ids, state=None, starting_from=0):
 
 def generate_reply_HF(question, original_question, seed, state, stopping_strings=None, is_chat=False):
     generate_params = {}
-    for k in ['max_new_tokens', 'temperature', 'temperature_last', 'dynamic_temperature', 'dynatemp_low', 'dynatemp_high', 'dynatemp_exponent', 'top_p', 'min_p', 'top_k', 'repetition_penalty', 'presence_penalty', 'frequency_penalty', 'repetition_penalty_range', 'typical_p', 'tfs', 'top_a', 'guidance_scale', 'penalty_alpha', 'mirostat_mode', 'mirostat_tau', 'mirostat_eta', 'do_sample', 'encoder_repetition_penalty', 'no_repeat_ngram_size', 'min_length', 'num_beams', 'length_penalty', 'early_stopping']:
+    for k in ['max_new_tokens', 'temperature', 'temperature_last', 'dynamic_temperature', 'dynamic_temperature_low', 'top_p', 'min_p', 'top_k', 'repetition_penalty', 'presence_penalty', 'frequency_penalty', 'repetition_penalty_range', 'typical_p', 'tfs', 'top_a', 'guidance_scale', 'penalty_alpha', 'mirostat_mode', 'mirostat_tau', 'mirostat_eta', 'do_sample', 'encoder_repetition_penalty', 'no_repeat_ngram_size', 'min_length', 'num_beams', 'length_penalty', 'early_stopping']:
         generate_params[k] = state[k]
 
     if state['negative_prompt'] != '':
         generate_params['negative_prompt_ids'] = encode(state['negative_prompt'])
-
-    if state['prompt_lookup_num_tokens'] > 0:
-        generate_params['prompt_lookup_num_tokens'] = state['prompt_lookup_num_tokens']
 
     for k in ['epsilon_cutoff', 'eta_cutoff']:
         if state[k] > 0:
@@ -313,6 +313,19 @@ def generate_reply_HF(question, original_question, seed, state, stopping_strings
     if shared.args.deepspeed:
         generate_params.update({'synced_gpus': True})
 
+    #tune the prompt based on qwen
+    QWEN_PROMPT_FORMAT = """
+    <|im_start|>system
+    You are a helpful assistant.
+    <|im_end|>
+    <|im_start|>user
+    {prompt}
+    <|im_end|>
+    <|im_start|>assistant
+    """
+    if shared.model.config.model_type == "qwen":
+        question = QWEN_PROMPT_FORMAT.format(prompt=question)
+
     # Encode the input
     input_ids = encode(question, add_bos_token=state['add_bos_token'], truncation_length=get_max_prompt_length(state))
     output = input_ids[0]
@@ -328,10 +341,19 @@ def generate_reply_HF(question, original_question, seed, state, stopping_strings
         generate_params.update({'inputs_embeds': inputs_embeds})
 
     # Stopping criteria / eos token
+    generate_params['stopping_criteria'] = transformers.StoppingCriteriaList()
     eos_token_ids = [shared.tokenizer.eos_token_id] if shared.tokenizer.eos_token_id is not None else []
     generate_params['eos_token_id'] = eos_token_ids
-    generate_params['stopping_criteria'] = transformers.StoppingCriteriaList()
-    generate_params['stopping_criteria'].append(_StopEverythingStoppingCriteria())
+
+    if shared.model.config.model_type == "qwen":
+        stopping_words = ["<|endoftext|>", "<|im_end|>", "<|im_start|>"]
+        generate_params['stopping_criteria'].append(StopWordsCriteria(stopping_words, shared.tokenizer))
+
+    for st in state['custom_stopping_strings']:
+        if type(st) is str:
+            stopping_words = [item.strip().strip('"') for item in [state['custom_stopping_strings']][0].split(',')]
+            generate_params['stopping_criteria'].append(StopWordsCriteria(stopping_words, shared.tokenizer))
+
 
     # Logits processor
     processor = state.get('logits_processor', LogitsProcessorList([]))
@@ -380,6 +402,11 @@ def generate_reply_HF(question, original_question, seed, state, stopping_strings
 
             def generate_with_streaming(**kwargs):
                 return Iteratorize(generate_with_callback, [], kwargs, callback=None)
+
+            # warm-up
+            with torch.no_grad():
+                shared.model.generate(**generate_params)
+                torch.xpu.synchronize()
 
             with generate_with_streaming(**generate_params) as generator:
                 cumulative_reply = ''
