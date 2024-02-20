@@ -14,9 +14,9 @@ Please see [BigDL-LLm Installation on Windows](https://bigdl.readthedocs.io/en/l
 ### 1.2 Install other required dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements_cpu_only.txt
 ```
-Note: Text-Generation-WebUI requires transformers version >= 4.36.0
+Note: Text-Generation-WebUI requires `transformers` version >= 4.36.0
 
 
 ## 2. Start the WebUI Server
@@ -25,7 +25,7 @@ Note: Text-Generation-WebUI requires transformers version >= 4.36.0
 
 For a quick start, you may run the script as below to start WebUI directly, it will automatically optimize and accelerate LLMs using INT4 optimizations.
 ```bash
-python server.py
+python server.py --load-in-4bit
 ```
 
 ### 2.2 Optimizations for Other Percisions
@@ -50,21 +50,27 @@ This share link expires in 72 hours. For free permanent hosting and GPU upgrades
 ## 3. Run Models
 
 ### 3.1 Select the Model
-First, place your local model in `Text-Generation-WebUI/models` directory, you may also choose to download a model from Hugging Face.
 
-Next, please click the `Model` button to choose your model.
+#### 3.1.1 Download the Model
+If you need to download a model, enter the Hugging Face username or model path, for instance: `Qwen/Qwen-7B-Chat`.
 
-![Image text](https://github.com/intel-analytics/BigDL/blob/1df67d7927ebea0af570b09f36ce76efbf9b8bad/python/llm/example/Text-Generation-WebUI/readme_folder/image.png)
+![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image.png)
+
+#### 3.1.2 Place the Model
+After you have downloaded the model (or if you already have the model locally), please place the model in `Text-Generation-WebUI/models` directory.
+
+After completing the two steps above, please click the `Model` button to select your model.
+
+![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image1.png)
 
 
 ### 3.2 Enable BigDL-LLM Optimizations
-Text-Generation-WebUI supports multiple backends, including `Transformers`, `llama.cpp`, `BigDL-LLM`, etc. Please select the BigDL-LLM backend as below to enable low-bit optimizations.
+Text-Generation-WebUI supports multiple backends, including `BigDL-LLM`, `Transformers`, `llama.cpp`, etc (the default backend is `BigDL-LLM`). Please select the BigDL-LLM backend as below to enable low-bit optimizations.
 
-![Image text](https://github.com/intel-analytics/BigDL/blob/1df67d7927ebea0af570b09f36ce76efbf9b8bad/python/llm/example/Text-Generation-WebUI/readme_folder/image-1.png)
 
-Then please select the device according to your device.
+Then please select the device according to your device (the default device is `GPU`).
 
-![Image text](https://github.com/intel-analytics/BigDL/blob/1df67d7927ebea0af570b09f36ce76efbf9b8bad/python/llm/example/Text-Generation-WebUI/readme_folder/image-2.png)
+![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image2.png)
 
 
 ### 3.3 Load Model in Low Precision 
@@ -82,11 +88,50 @@ Notes:
 
 Now you may click the `Load` button to load the model with BigDL-LLM optimizations.
 
-![Image text](https://github.com/intel-analytics/BigDL/blob/1df67d7927ebea0af570b09f36ce76efbf9b8bad/python/llm/example/Text-Generation-WebUI/readme_folder/image-3.png)
+![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image3.png)
 
 
 ### 3.4 Run the Model on WebUI
 
-Now you can do model inference on Text-Generation-WebUI with BigDL-LLM optimizations, including `Chat`, `Default` and `Notebook` Tabs. Please see [Chat-Tab Wiki](https://github.com/oobabooga/text-generation-webui/wiki/01-%E2%80%90-Chat-Tab) and [Default and Notebook Tabs Wiki](https://github.com/oobabooga/text-generation-webui/wiki/02-%E2%80%90-Default-and-Notebook-Tabs) for more details.
+After completing the steps of model preparation, enabling BigDL-LLM optimizations, and loading model, you may need to sepecify parameters in the `Parameters tab` according to the needs of your task.
 
-![Image text](https://github.com/intel-analytics/BigDL/blob/1df67d7927ebea0af570b09f36ce76efbf9b8bad/python/llm/example/Text-Generation-WebUI/readme_folder/image-4.png)
+Notes:
+* `max_new_tokens`: Maximum number of tokens to generate.
+
+* `truncate_length`: Used to prevent the prompt from getting bigger than the model's context length. 
+
+* Please see [Parameters-Tab Wiki](https://github.com/oobabooga/text-generation-webui/wiki/03-%E2%80%90-Parameters-Tab) for more details.
+
+Now you can do model inference on Text-Generation-WebUI with BigDL-LLM optimizations, including `Chat`, `Default` and `Notebook` Tabs.
+
+#### 3.4.1 Chat Tab
+
+`Chat tab` supports having multi-turn conversations with the model. You may simply enter prompts and click the `Generate` button to get responses.
+
+Notes:
+* Multi-turn conversations may consume GPU memory, you may sepecify the `truncate length` in `Parameters tab` to reduce the GPU memory usage.
+
+* You may switch to a single-turn conversation mode by turning off `Activate text streaming` in the Parameters tab.
+
+* Please see [Chat-Tab Wiki](https://github.com/oobabooga/text-generation-webui/wiki/01-%E2%80%90-Chat-Tab) for more details.
+
+![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image4.png)
+
+#### 3.4.2 Default Tab
+
+You may use the `Default tab` to generate raw completions starting from your prompt.
+
+This tab contains two main text boxes: Input, where you enter your prompt, and Output, where the model output will appear.
+
+Please see [Default-Tab Wiki](https://github.com/oobabooga/text-generation-webui/wiki/02-%E2%80%90-Default-and-Notebook-Tabs#default-tab) for more details.
+
+![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image5.png)
+
+
+#### 3.4.3 Notebook Tab
+
+You may use the `Notebook tab` to do exactly what the Default tab does, with the difference being that the output appears in the same text box as the input.
+
+Please see [Notebook-Tab Wiki](https://github.com/oobabooga/text-generation-webui/wiki/02-%E2%80%90-Default-and-Notebook-Tabs#notebook-tab) for more details.
+
+![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image6.png)
