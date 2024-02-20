@@ -3,21 +3,24 @@ This tutorial provides a step-by-step guide on how to use Text-Generation-WebUI 
 
 The WebUI is ported from [Text-Generation-WebUI](https://github.com/oobabooga/text-generation-webui).
 
-## 1. Prepare the environment on Windows
 
-Before starting all the steps, you need to download the text-generation-webui based on `BigDL-LLM` optimizations as below:
+## 1. Download and Unzip WebUI
+
+Before starting all the steps, you need to download and unzip the text-generation-webui based on `BigDL-LLM` optimizations.
 
 ```bash
-https://github.com/intel-analytics/text-generation-webui.git
+https://github.com/intel-analytics/text-generation-webui/archive/refs/heads/bigdl-llm.zip
 ```
+
+## 2. Prepare the Environment on Windows
 
 Please use a python environment management tool (we recommend using Conda) to create a python enviroment and install necessary libs.
 
-### 1.1 Install BigDL-LLM
+### 2.1 Install BigDL-LLM
 
 Please see [BigDL-LLm Installation on Windows](https://bigdl.readthedocs.io/en/latest/doc/LLM/Overview/install_gpu.html#windows) for more details to install BigDL-LLM on your Client.
 
-### 1.2 Install other required dependencies
+### 2.2 Install Other Required Dependencies
 
 ```bash
 pip install -r requirements_cpu_only.txt
@@ -25,23 +28,23 @@ pip install -r requirements_cpu_only.txt
 Note: Text-Generation-WebUI requires `transformers` version >= 4.36.0
 
 
-## 2. Start the WebUI Server
+## 3. Start the WebUI Server
 
-### 2.1 For INT4 Optimizations
+### 3.1 For INT4 Optimizations
 
 For a quick start, you may run the script as below to start WebUI directly, it will automatically optimize and accelerate LLMs using INT4 optimizations.
 ```bash
 python server.py --load-in-4bit
 ```
 
-### 2.2 Optimizations for Other Percisions
+### 3.2 Optimizations for Other Percisions
 
 To enable optimizations for more precisions (`sym_int4`, `asym_int4`, `sym_int8`, `fp4`, `fp8`, `fp16`, `mixed_fp4`, `mixed_fp8`, etc.), you may run the command as below:
 ```bash
 python server.py --load-in-low-bit
 ```
 
-### 2.3 Access the WebUI
+### 3.3 Access the WebUI
 
 After the successful startup of the WebUI server, it will provide links to access the WebUI as below. Please open the public URL in your browser to access the full functionality of the WebUI.
 
@@ -53,16 +56,16 @@ This share link expires in 72 hours. For free permanent hosting and GPU upgrades
 ```
 
 
-## 3. Run Models
+## 4. Run Models
 
-### 3.1 Select the Model
+### 4.1 Select the Model
 
-#### 3.1.1 Download the Model
+#### 4.1.1 Download the Model
 If you need to download a model, enter the Hugging Face username or model path, for instance: `Qwen/Qwen-7B-Chat`.
 
 ![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image.png)
 
-#### 3.1.2 Place the Model
+#### 4.1.2 Place the Model
 After you have downloaded the model (or if you already have the model locally), please place the model in `Text-Generation-WebUI/models` directory.
 
 After completing the two steps above, you may click the `Model` button to select your model.
@@ -70,7 +73,7 @@ After completing the two steps above, you may click the `Model` button to select
 ![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image1.png)
 
 
-### 3.2 Enable BigDL-LLM Optimizations
+### 4.2 Enable BigDL-LLM Optimizations
 Text-Generation-WebUI supports multiple backends, including `BigDL-LLM`, `Transformers`, `llama.cpp`, etc (the default backend is `BigDL-LLM`). You may select the BigDL-LLM backend as below to enable low-bit optimizations.
 
 
@@ -79,7 +82,7 @@ Then please select the device according to your device (the default device is `G
 ![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image2.png)
 
 
-### 3.3 Load Model in Low Precision 
+### 4.3 Load Model in Low Precision 
 
 One common use case of BigDL-LLM is to load a Hugging Face transformers model in low precision.
 
@@ -97,7 +100,7 @@ Now you may click the `Load` button to load the model with BigDL-LLM optimizatio
 ![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image3.png)
 
 
-### 3.4 Run the Model on WebUI
+### 4.4 Run the Model on WebUI
 
 After completing the steps of model preparation, enabling BigDL-LLM optimizations, and loading model, you may need to sepecify parameters in the `Parameters tab` according to the needs of your task.
 
@@ -110,7 +113,7 @@ Notes:
 
 Now you may do model inference on Text-Generation-WebUI with BigDL-LLM optimizations, including `Chat`, `Default` and `Notebook` Tabs.
 
-#### 3.4.1 Chat Tab
+#### 4.4.1 Chat Tab
 
 `Chat tab` supports having multi-turn conversations with the model. You may simply enter prompts and click the `Generate` button to get responses.
 
@@ -123,7 +126,7 @@ Notes:
 
 ![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image4.png)
 
-#### 3.4.2 Default Tab
+#### 4.4.2 Default Tab
 
 You may use the `Default tab` to generate raw completions starting from your prompt.
 
@@ -134,9 +137,9 @@ Please see [Default-Tab Wiki](https://github.com/oobabooga/text-generation-webui
 ![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image5.png)
 
 
-#### 3.4.3 Notebook Tab
+#### 4.4.3 Notebook Tab
 
-You may use the `Notebook tab` to do exactly what the Default tab does, with the difference being that the output appears in the same text box as the input.
+You may use the `Notebook tab` to do exactly what the `Default tab` does, with the difference being that the output appears in the same text box as the input.
 
 Please see [Notebook-Tab Wiki](https://github.com/oobabooga/text-generation-webui/wiki/02-%E2%80%90-Default-and-Notebook-Tabs#notebook-tab) for more details.
 
