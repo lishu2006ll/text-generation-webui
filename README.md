@@ -59,13 +59,13 @@ If you need to download a model, enter the Hugging Face username or model path, 
 #### 3.1.2 Place the Model
 After you have downloaded the model (or if you already have the model locally), please place the model in `Text-Generation-WebUI/models` directory.
 
-After completing the two steps above, please click the `Model` button to select your model.
+After completing the two steps above, you may click the `Model` button to select your model.
 
 ![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image1.png)
 
 
 ### 3.2 Enable BigDL-LLM Optimizations
-Text-Generation-WebUI supports multiple backends, including `BigDL-LLM`, `Transformers`, `llama.cpp`, etc (the default backend is `BigDL-LLM`). Please select the BigDL-LLM backend as below to enable low-bit optimizations.
+Text-Generation-WebUI supports multiple backends, including `BigDL-LLM`, `Transformers`, `llama.cpp`, etc (the default backend is `BigDL-LLM`). You may select the BigDL-LLM backend as below to enable low-bit optimizations.
 
 
 Then please select the device according to your device (the default device is `GPU`).
@@ -81,7 +81,7 @@ Notes:
 
 -  When you start the web UI with `--load-in-4bit`, you will not be allowed to choose the quantization precision in `load-in-low-bit`. The model will be loaded with the INT4 precision as default.
 
--  When you want to load model in other precisions, please run server.py with `--load-in-low-bit` parameter. You may choose the precision from the list of `load-in-low-bit` option, and the `load-in-4bit` option will be disabled.
+-  When you want to load model in other precisions, you may run server.py with `--load-in-low-bit` parameter. You may choose the precision from the list of `load-in-low-bit` option, and the `load-in-4bit` option will be disabled.
 
 -  Please select the `optimize-model` and `use_cache` options to accelerate the model.
 
@@ -102,7 +102,7 @@ Notes:
 
 * Please see [Parameters-Tab Wiki](https://github.com/oobabooga/text-generation-webui/wiki/03-%E2%80%90-Parameters-Tab) for more details.
 
-Now you can do model inference on Text-Generation-WebUI with BigDL-LLM optimizations, including `Chat`, `Default` and `Notebook` Tabs.
+Now you may do model inference on Text-Generation-WebUI with BigDL-LLM optimizations, including `Chat`, `Default` and `Notebook` Tabs.
 
 #### 3.4.1 Chat Tab
 
