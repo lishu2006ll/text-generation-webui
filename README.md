@@ -97,7 +97,9 @@ After completing the steps of model preparation, enabling BigDL-LLM optimization
 
 Notes:
 * `max_new_tokens`: Maximum number of tokens to generate.
+
 * `truncate_length`: Used to prevent the prompt from getting bigger than the model's context length. 
+
 * Please see [Parameters-Tab Wiki](https://github.com/oobabooga/text-generation-webui/wiki/03-%E2%80%90-Parameters-Tab) for more details.
 
 Now you can do model inference on Text-Generation-WebUI with BigDL-LLM optimizations, including `Chat`, `Default` and `Notebook` Tabs.
@@ -108,7 +110,9 @@ Now you can do model inference on Text-Generation-WebUI with BigDL-LLM optimizat
 
 Notes:
 * Multi-turn conversations may consume GPU memory, you may sepecify the `truncate length` in `Parameters tab` to reduce the GPU memory usage.
+
 * You may switch to a single-turn conversation mode by turning off `Activate text streaming` in the Parameters tab.
+
 * Please see [Chat-Tab Wiki](https://github.com/oobabooga/text-generation-webui/wiki/01-%E2%80%90-Chat-Tab) for more details.
 
 ![Image text](https://github.com/intel-analytics/text-generation-webui/blob/8ebee0651dd56012c4a9e0ba6932efec4c7d1b2e/readme_folder/image4.png)
