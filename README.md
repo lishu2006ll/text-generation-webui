@@ -5,6 +5,12 @@ The WebUI is ported from [Text-Generation-WebUI](https://github.com/oobabooga/te
 
 ## 1. Prepare the environment on Windows
 
+Before starting all the steps, you need to download the text-generation-webui based on `BigDL-LLM` optimizations as below:
+
+```bash
+https://github.com/intel-analytics/text-generation-webui.git
+```
+
 Please use a python environment management tool (we recommend using Conda) to create a python enviroment and install necessary libs.
 
 ### 1.1 Install BigDL-LLM
