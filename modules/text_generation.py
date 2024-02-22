@@ -278,7 +278,7 @@ def get_reply_from_output_ids(output_ids, state, starting_from=0):
     if (hasattr(shared.tokenizer, 'convert_ids_to_tokens') and len(output_ids) > starting_from) and not reply.startswith(' '):
         first_token = shared.tokenizer.convert_ids_to_tokens(int(output_ids[starting_from]))
         if isinstance(first_token, (bytes,)):
-            first_token = first_token.decode('utf8')
+            first_token = first_token.decode('utf8', errors='ignore')
 
         if first_token.startswith('▁'):
             reply = ' ' + reply
