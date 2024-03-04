@@ -314,17 +314,17 @@ def generate_reply_HF(question, original_question, seed, state, stopping_strings
         generate_params.update({'synced_gpus': True})
 
     #tune the prompt based on qwen
-    QWEN_PROMPT_FORMAT = """
-    <|im_start|>system
-    You are a helpful assistant.
-    <|im_end|>
-    <|im_start|>user
-    {prompt}
-    <|im_end|>
-    <|im_start|>assistant
-    """
-    if shared.model.config.model_type == "qwen":
-        question = QWEN_PROMPT_FORMAT.format(prompt=question)
+    # QWEN_PROMPT_FORMAT = """
+    # <|im_start|>system
+    # You are a helpful assistant.
+    # <|im_end|>
+    # <|im_start|>user
+    # {prompt}
+    # <|im_end|>
+    # <|im_start|>assistant
+    # """
+    # if shared.model.config.model_type == "qwen":
+    #     question = QWEN_PROMPT_FORMAT.format(prompt=question)
 
     # Encode the input
     input_ids = encode(question, add_bos_token=state['add_bos_token'], truncation_length=get_max_prompt_length(state))
