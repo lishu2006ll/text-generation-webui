@@ -60,6 +60,7 @@ def load_model(model_name, loader=None):
     shared.is_seq2seq = False
     shared.model_name = model_name
     load_func_map = {
+        'BigDL-LLM-EX': bigdl_llm_loader_ex,
         'BigDL-LLM': bigdl_llm_loader,
         'Transformers': huggingface_loader,
         'AutoGPTQ': AutoGPTQ_loader,
@@ -353,6 +354,41 @@ def bigdl_llm_loader(model_name):
     if shared.args.device == "GPU":
         import intel_extension_for_pytorch
         model = model.to("xpu")
+
+    tokenizer = AutoTokenizer.from_pretrained(path_to_model, trust_remote_code=shared.args.trust_remote_code)
+
+    return model, tokenizer
+
+def bigdl_llm_loader_ex(model_name):   
+       
+    from bigdl.llm.transformers import AutoModelForCausalLM, AutoModel, AutoModelForSeq2SeqLM
+
+    path_to_model = Path(f'{shared.args.model_dir}/{model_name}')
+    print(path_to_model);
+    config = AutoConfig.from_pretrained(path_to_model, trust_remote_code=shared.args.trust_remote_code)
+
+    if 'chatglm' in model_name.lower():
+        LoaderClass = AutoModel
+    else:
+        if config.to_dict().get('is_encoder_decoder', False):
+            LoaderClass = AutoModelForSeq2SeqLM
+            shared.is_seq2seq = True
+        else:
+            LoaderClass = AutoModelForCausalLM
+           
+    model = LoaderClass.load_low_bit(
+                path_to_model,
+                load_in_low_bit=shared.args.load_in_low_bit,
+                optimize_model=shared.args.optimize_model,
+                #modules_to_not_convert=shared.args.modules_to_not_convert,
+                cpu_embedding=shared.args.cpu_embedding,
+                #lightweight_bmm=shared.args.lightweight_bmm,
+                trust_remote_code=shared.args.trust_remote_code,
+                use_cache=shared.args.use_cache,
+                )
+    if shared.args.device == "GPU":
+        import intel_extension_for_pytorch
+        model = model.to("xpu")          
 
     tokenizer = AutoTokenizer.from_pretrained(path_to_model, trust_remote_code=shared.args.trust_remote_code)
 

@@ -120,6 +120,15 @@ loaders_and_params = OrderedDict({
         'trust_remote_code',
         'use_cache',
     ],
+    'BigDL-LLM-EX': [
+        'load_in_low_bit',
+        'optimize_model',
+        #'modules_to_not_convert',
+        'cpu_embedding',
+        #'lightweight_bmm',
+        'trust_remote_code',
+        'use_cache',
+    ],
     'AutoAWQ': [
         'cpu_memory',
         'gpu_memory',

@@ -170,6 +170,20 @@ group.add_argument('--cpu-embedding', action='store_true', default=True, help='W
 group.add_argument('--use-cache', action='store_true', default=True, help='If use_cache is True, past key values are used to speed up decoding if applicable to model.')
 group.add_argument('--trust-remote-code', action='store_true', default=True, help='Set trust_remote_code=True while loading the model. Necessary for some models.')
 
+
+# BigDL-LLM-EX
+group = parser.add_argument_group('BigDL-LLM-EX')
+group.add_argument('--device', type=str, default='GPU', help='the device type, it could be CPU or GPU')
+group.add_argument('--load-in-low-bit', type=str, default=None, help='str value, 选项可以是： sym_int4, asym_int4, sym_int5, asym_int5'\
+                   ', sym_int8, nf3, nf4, fp4, fp8, fp8_e4m3, fp8_e5m2, fp16 or bf16. sym_int4 意思为对称int 4, asym_int4 means asymmetric int 4,'\
+                   'nf4 means 4-bit NormalFloat, etc. 相关的低位优化将应用于模型.')
+group.add_argument('--optimize-model', action='store_true', default=True, help='boolean value, Whether to further optimize the low_bit llm model.')
+#group.add_argument('--modules-to-not-convert', type=str, default=None, help='list of str value, modules (nn.Module) that are skipped when conducting model optimizations.')
+group.add_argument('--cpu-embedding', action='store_true', default=True, help='Whether to replace the Embedding layer, may need to set it to `True` when running BigDL-LLM on GPU on Windows. Default to be `False`')
+#group.add_argument('--lightweight-bmm', action='store_true', help='Whether to replace the torch.bmm ops, may need to set it to `True` when running BigDL-LLM on GPU on Windows.')
+group.add_argument('--use-cache', action='store_true', default=True, help='If use_cache is True, past key values are used to speed up decoding if applicable to model.')
+group.add_argument('--trust-remote-code', action='store_true', default=True, help='Set trust_remote_code=True while loading the model. Necessary for some models.')
+
 # HQQ
 group = parser.add_argument_group('HQQ')
 group.add_argument('--hqq-backend', type=str, default='PYTORCH_COMPILE', help='Backend for the HQQ loader. Valid options: PYTORCH, PYTORCH_COMPILE, ATEN.')
@@ -276,6 +290,8 @@ def fix_loader_name(name):
         return 'HQQ'
     elif name in ['BigDL-LLM', 'bigdl-llm', 'bigdl']:
         return 'BigDL-LLM'
+    elif name in ['BigDL-LLM-EX']:
+        return 'BigDL-LLM-EX'
 
 
 def add_extension(name, last=False):
