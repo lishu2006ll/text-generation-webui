@@ -3,7 +3,7 @@
 ## Quick Start
 To get started, please see the step-by-step [quickstart](https://bigdl.readthedocs.io/en/latest/doc/LLM/Quickstart/webui_quickstart.html).
 
-![Image text](https://llm-assets.readthedocs.io/en/latest/_images/webui_quickstart_chat.png)
+[<img src="https://llm-assets.readthedocs.io/en/latest/_images/webui_quickstart_chat.png" height="480px">](https://bigdl.readthedocs.io/en/latest/doc/LLM/Quickstart/webui_quickstart.html)
 
 ## User Guide
 For more information, see the user guide below.
