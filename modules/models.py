@@ -359,6 +359,7 @@ def bigdl_llm_loader(model_name):
 
     return model, tokenizer
 
+
 def bigdl_llm_loader_ex(model_name):   
        
     from bigdl.llm.transformers import AutoModelForCausalLM, AutoModel, AutoModelForSeq2SeqLM
@@ -386,14 +387,18 @@ def bigdl_llm_loader_ex(model_name):
                 trust_remote_code=shared.args.trust_remote_code,
                 use_cache=shared.args.use_cache,
                 )
+ 
+    # 判断是xpu还是cuda
     if shared.args.device == "GPU":
-        import intel_extension_for_pytorch
-        model = model.to("xpu")          
+        import intel_extension_for_pytorch as ipex
+        model = model.to("xpu")
+    else:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model = model.to(device)             
 
     tokenizer = AutoTokenizer.from_pretrained(path_to_model, trust_remote_code=shared.args.trust_remote_code)
 
     return model, tokenizer
-
 
 def QuipSharp_loader(model_name):
     try:
