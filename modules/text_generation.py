@@ -26,7 +26,6 @@ from modules.html_generator import generate_4chan_html, generate_basic_html
 from modules.logging_colors import logger
 from modules.models import clear_torch_cache, local_rank
 
-
 def generate_reply(*args, **kwargs):
     shared.generation_lock.acquire()
     try:
@@ -403,10 +402,15 @@ def generate_reply_HF(question, original_question, seed, state, stopping_strings
             def generate_with_streaming(**kwargs):
                 return Iteratorize(generate_with_callback, [], kwargs, callback=None)
 
-            # warm-up
+            # warm-up   
             with torch.no_grad():
                 shared.model.generate(**generate_params)
-                torch.xpu.synchronize()
+                if is_torch_xpu_available() or shared.args.device == "GPU":
+                    torch.xpu.synchronize()
+                elif shared.args.deepspeed:
+                    torch.distributed.barrier()
+                else:
+                    torch.cuda.synchronize()
 
             with generate_with_streaming(**generate_params) as generator:
                 cumulative_reply = ''
