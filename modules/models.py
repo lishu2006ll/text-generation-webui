@@ -18,6 +18,7 @@ from transformers import (
     AutoTokenizer,
     BitsAndBytesConfig,
     #GPTQConfig
+    is_torch_xpu_available,
 )
 
 import modules.shared as shared
@@ -389,9 +390,11 @@ def bigdl_llm_loader_ex(model_name):
                 )
  
     # 判断是xpu还是cuda
-    if shared.args.device == "GPU":
+    if is_torch_xpu_available() and shared.args.device == "GPU":
         import intel_extension_for_pytorch as ipex
         model = model.to("xpu")
+    elif shared.args.device == "CPU":
+        print("use cpu do predict!!!")
     else:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = model.to(device)             

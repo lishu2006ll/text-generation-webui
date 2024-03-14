@@ -143,7 +143,7 @@ def encode(prompt, add_special_tokens=True, add_bos_token=True, truncation_lengt
         return input_ids.to(device)
     elif shared.args.device == "CPU":
         return input_ids
-    elif is_torch_xpu_available() or shared.args.device == "GPU":
+    elif is_torch_xpu_available() and shared.args.device == "GPU":
         return input_ids.to("xpu")
     else:
         return input_ids.cuda()
@@ -405,10 +405,12 @@ def generate_reply_HF(question, original_question, seed, state, stopping_strings
             # warm-up   
             with torch.no_grad():
                 shared.model.generate(**generate_params)
-                if is_torch_xpu_available() or shared.args.device == "GPU":
+                if is_torch_xpu_available() and shared.args.device == "GPU":
                     torch.xpu.synchronize()
                 elif shared.args.deepspeed:
                     torch.distributed.barrier()
+                elif shared.args.device == "CPU":
+                    torch.cpu.synchronize()
                 else:
                     torch.cuda.synchronize()
 
